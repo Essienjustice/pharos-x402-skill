@@ -1,0 +1,10 @@
+{
+  "name": "@pharosnetwork/x402-skill",
+  "version": "1.0.0",
+  "description": "The first agent skill for x402 micro-payments on Pharos Network — 30,000 TPS, sub-second finality, Chain ID 1672 (mainnet) / 688689 (testnet).",
+  "keywords": ["pharos", "x402", "agent-skill", "blockchain", "micro-payments", "usdc", "claude-code", "eip155:1672", "eip155:688689", "realfi"],
+  "author": "Pharos Network",
+  "license": "Apache-2.0",
+  "repository": { "type": "git", "url": "https://github.com/pharosnetwork/pharos-x402-skill" },
+  "homepage": "https://github.com/pharosnetwork/pharos-x402-skill#readme"
+}

@@ -1,0 +1,9 @@
+node_modules/
+.env
+.private_key
+dist/
+*.js.map
+.DS_Store
+pharos-x402-server/
+pharos-x402-client/
+pharos-x402-facilitator/
