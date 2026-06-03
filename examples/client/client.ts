@@ -1,44 +1,58 @@
 import { config } from "dotenv";
 config();
-import { wrapFetchWithPayment, x402Client, decodePaymentResponseHeader } from "@x402/fetch";
-import { ExactEvmScheme } from "@x402/evm/exact/client";
+
+import { decodePaymentResponseHeader, wrapFetchWithPayment, x402Client } from "@x402/fetch";
+import { registerExactEvmScheme } from "@x402/evm/exact/client";
 import { privateKeyToAccount } from "viem/accounts";
-import fs from "fs";
 
-type NetworkId = `${string}:${string}`;
+const privateKey = process.env.EVM_PRIVATE_KEY as `0x${string}` | undefined;
+const targetUrl = process.env.TARGET_URL || "http://localhost:4021/data";
+const network = process.env.PHAROS_NETWORK || "eip155:688689";
 
-const privateKey =
-  process.env.EVM_PRIVATE_KEY ||
-  (fs.existsSync(".private_key") ? fs.readFileSync(".private_key", "utf-8").trim() : null);
-if (!privateKey) { console.error("Set EVM_PRIVATE_KEY or create .private_key file"); process.exit(1); }
+if (!privateKey) {
+  console.error("EVM_PRIVATE_KEY required");
+  process.exit(1);
+}
 
-const signer = privateKeyToAccount(privateKey as `0x${string}`);
-const network: NetworkId = (process.env.PHAROS_NETWORK || "eip155:688689") as NetworkId;
-const client = new x402Client();
-client.register(network, new ExactEvmScheme(signer));
-const fetchWithPayment = wrapFetchWithPayment(fetch, client);
-const url = process.argv[2] || process.env.TARGET_URL || "http://localhost:4021/data";
+const evmPrivateKey = privateKey;
 
-console.log(`Requesting: ${url}`);
-console.log(`Wallet: ${signer.address}`);
-console.log(`Network: ${network}`);
+async function main() {
+  const signer = privateKeyToAccount(evmPrivateKey);
+  const client = new x402Client();
+  registerExactEvmScheme(client, {
+    signer,
+    networks: [network as `${string}:${string}`],
+  });
 
-const main = async () => {
-  try {
-    const response = await fetchWithPayment(url);
-    const data = await response.json();
-    console.log("Response:", JSON.stringify(data, null, 2));
-    const header = response.headers.get("PAYMENT-RESPONSE");
-    if (header) {
-      const p = decodePaymentResponseHeader(header);
-      console.log("Tx hash:", p.transaction);
-      console.log("Network:", p.network);
-      console.log("Payer:", p.payer);
+  const fetchWithPayment = wrapFetchWithPayment(globalThis.fetch, client);
+
+  console.log(`Requesting: ${targetUrl}`);
+  console.log(`Network: ${network}`);
+  console.log(`Wallet: ${signer.address}`);
+
+  const response = await fetchWithPayment(targetUrl);
+  const rawBody = await response.text();
+
+  console.log(`Status: ${response.status}`);
+  console.log(`Body: ${rawBody}`);
+
+  const paymentResponseHeader = response.headers.get("PAYMENT-RESPONSE");
+  const lowercasePaymentResponseHeader = response.headers.get("payment-response");
+  const receiptHeader = paymentResponseHeader || lowercasePaymentResponseHeader;
+
+  if (receiptHeader) {
+    console.log("PAYMENT-RESPONSE:", receiptHeader);
+    try {
+      console.log("Decoded payment receipt:", JSON.stringify(decodePaymentResponseHeader(receiptHeader), null, 2));
+    } catch (error) {
+      console.log("Could not decode PAYMENT-RESPONSE header:", error);
     }
-  } catch (err) {
-    console.error("Failed:", err);
-    process.exit(1);
+  } else {
+    console.log("No PAYMENT-RESPONSE header received.");
   }
-};
+}
 
-void main();
+main().catch((error) => {
+  console.error("Client request failed:", error);
+  process.exit(1);
+});
