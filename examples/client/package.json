@@ -1,0 +1,16 @@
+{
+  "name": "pharos-x402-client-example",
+  "version": "1.0.0",
+  "scripts": { "start": "npx ts-node client.ts" },
+  "dependencies": {
+    "@x402/fetch": "latest",
+    "@x402/evm": "latest",
+    "viem": "latest",
+    "dotenv": "^16"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "ts-node": "^10",
+    "@types/node": "^20"
+  }
+}
