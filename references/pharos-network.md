@@ -25,9 +25,15 @@ Pharos has demonstrated 30,000 TPS, sub-second finality, and a 0.5-second block 
 | Explorer | https://atlantic.pharosscan.xyz | https://pharosscan.xyz |
 | testnet flag | true | false |
 
+Use the Atlantic Testnet explorer at https://atlantic.pharosscan.xyz to verify test transactions.
+
 ## USDC
 
-Circle partnership support for Pharos was announced in March 2026, with USDC and CCTP deployed to Pharos mainnet in April 2026. The Atlantic Testnet unofficial USDC test token is `0xE0BE08c77f415F577A1B3A9aD7a1Df1479564ec8`; it is not for production use. The Pacific Ocean Mainnet USDC address must be fetched from https://docs.pharos.xyz before deployment.
+Circle partnership support for Pharos was announced in March 2026, with USDC and CCTP deployed to Pharos mainnet in April 2026. The Atlantic Testnet Circle official USDC test token is `0xcfc8330f4bcab529c625d12781b1c19466a9fc8b`; it is not for production use. The Pacific Ocean Mainnet USDC address must be fetched from https://docs.pharos.xyz before deployment.
+
+## Skill Engine Campaign
+
+The Pharos Skill Engine campaign runs until June 8, 2026.
 
 ## Why Pharos For x402
 

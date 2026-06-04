@@ -9,7 +9,7 @@ USDC uses 6 decimal places. 1 USDC equals 1,000,000 raw units, or 1e6. In an x40
 
 ## Testnet Address
 
-The Atlantic Testnet unofficial USDC test token address is `0xE0BE08c77f415F577A1B3A9aD7a1Df1479564ec8` on chain 688689. This is a test token deployed by the Pharos team for SDK testing only and is not for production use.
+The Atlantic Testnet Circle official USDC test token address is `0xcfc8330f4bcab529c625d12781b1c19466a9fc8b` on chain 688689. This is a test token for Atlantic Testnet development and is not for production use.
 
 ## Mainnet USDC
 
@@ -34,7 +34,9 @@ await walletClient.readContract({
 
 ## Getting Testnet USDC
 
-Visit https://testnet.pharosnetwork.xyz and use the faucet to obtain testnet USDC and testnet PHRS for gas.
+Go to https://faucet.circle.com, select Pharos from the network dropdown, enter your wallet address, and claim up to 20 USDC every 2 hours.
+
+Use https://testnet.pharosnetwork.xyz to obtain testnet PHRS for gas.
 
 ## Important
 

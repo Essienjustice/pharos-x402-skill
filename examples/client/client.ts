@@ -6,7 +6,6 @@ import { registerExactEvmScheme } from "@x402/evm/exact/client";
 import { privateKeyToAccount } from "viem/accounts";
 
 const privateKey = process.env.EVM_PRIVATE_KEY as `0x${string}` | undefined;
-const targetUrl = process.env.TARGET_URL || "http://localhost:4021/data";
 const network = process.env.PHAROS_NETWORK || "eip155:688689";
 
 if (!privateKey) {
@@ -16,8 +15,23 @@ if (!privateKey) {
 
 const evmPrivateKey = privateKey;
 
+function getTargetUrl(): string {
+  const urlFlagIndex = process.argv.indexOf("--url");
+  if (urlFlagIndex !== -1) {
+    const url = process.argv[urlFlagIndex + 1];
+    if (!url) {
+      console.error("Missing value for --url");
+      process.exit(1);
+    }
+    return url;
+  }
+
+  return process.env.TARGET_URL || "http://localhost:4021/data";
+}
+
 async function main() {
   const signer = privateKeyToAccount(evmPrivateKey);
+  const targetUrl = getTargetUrl();
   const client = new x402Client();
   registerExactEvmScheme(client, {
     signer,
@@ -43,7 +57,12 @@ async function main() {
   if (receiptHeader) {
     console.log("PAYMENT-RESPONSE:", receiptHeader);
     try {
-      console.log("Decoded payment receipt:", JSON.stringify(decodePaymentResponseHeader(receiptHeader), null, 2));
+      const receipt = decodePaymentResponseHeader(receiptHeader);
+      console.log("Decoded payment receipt:", JSON.stringify(receipt, null, 2));
+      if (receipt.success && receipt.transaction) {
+        console.log("🧾 TX:", receipt.transaction);
+        console.log("💸 Paid: $0.001 USDC on Pharos Atlantic Testnet");
+      }
     } catch (error) {
       console.log("Could not decode PAYMENT-RESPONSE header:", error);
     }

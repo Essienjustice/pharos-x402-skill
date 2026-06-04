@@ -8,6 +8,7 @@ import type { RoutesConfig } from "@x402/core/server";
 import type { Network } from "@x402/core/types";
 import { ExactEvmScheme } from "@x402/evm/exact/server";
 
+const seenPayments = new Set<string>();
 const payToAddress = process.env.PAY_TO_ADDRESS as `0x${string}` | undefined;
 const facilitatorUrl = process.env.FACILITATOR_URL || "http://localhost:3000";
 const port = Number.parseInt(process.env.PORT || "4021", 10);
@@ -66,7 +67,47 @@ const routes: RoutesConfig = {
 };
 
 const app = express();
+app.use((req, _res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+
 app.use(paymentMiddleware(routes, resourceServer));
+
+function extractTransactionHash(headerValue: string | string[] | undefined): string | null {
+  const value = Array.isArray(headerValue) ? headerValue[0] : headerValue;
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const decoded = Buffer.from(value, "base64").toString("utf8");
+    const paymentResponse = JSON.parse(decoded) as { transaction?: unknown; tx_hash?: unknown; txHash?: unknown };
+    const txHash = paymentResponse.transaction ?? paymentResponse.tx_hash ?? paymentResponse.txHash;
+    return typeof txHash === "string" && txHash.length > 0 ? txHash : null;
+  } catch {
+    return null;
+  }
+}
+
+app.use(["/data", "/api/premium"], (req, res, next) => {
+  const txHash =
+    extractTransactionHash(req.headers["x-payment-response"]) ??
+    extractTransactionHash(req.headers["payment-response"]);
+
+  if (!txHash) {
+    next();
+    return;
+  }
+
+  if (seenPayments.has(txHash)) {
+    res.status(409).json({ error: "duplicate payment rejected" });
+    return;
+  }
+
+  seenPayments.add(txHash);
+  next();
+});
 
 app.get("/data", (_req, res) => {
   res.json({

@@ -33,6 +33,12 @@ activation:
 
 x402 is the HTTP 402 Payment Required protocol reactivated for crypto micro-payments. This skill lets agents build monetized APIs, pay for x402-gated services, or run settlement infrastructure, all on Pharos Network. Pharos is currently the only major EVM chain with a first-class x402 skill in the agent skills registries, covering Atlantic Testnet and Pacific Mainnet.
 
+Live testing proof on Pharos Atlantic Testnet (`eip155:688689`):
+
+- `0x6b6adb78c0ae0d712c99e69fe3d3c5239b432517408a268f475624e459990594`
+- `0x364ef3d20e06a713f23bf6922262068c2788fe911dbb217d86e087dd089924b8`
+- `0xc7d84b419b86c5c850a8c7331390d89966043bed74c35bae93f86c95e45eb913`
+
 ## When to use this skill
 
 - "I want to charge for my API / monetize an endpoint" -> Role: SERVER
@@ -56,7 +62,7 @@ Always verify the latest RPC URLs and USDC contract addresses at https://docs.ph
 
 ## USDC token addresses
 
-- Atlantic Testnet (unofficial test token): `0xE0BE08c77f415F577A1B3A9aD7a1Df1479564ec8` - NOT for production
+- Atlantic Testnet (Circle official test token): `0xcfc8330f4bcab529c625d12781b1c19466a9fc8b`
 - Pacific Mainnet: Retrieve from official docs before use. USDC and CCTP deployed to Pharos mainnet in April 2026 via Circle partnership. Do NOT hardcode; always read from docs.pharos.xyz.
 - USDC has 6 decimals. 1 USDC = 1,000,000 raw units. Conversion: `Math.round(amountUSD * 1e6).toString()`
 
@@ -304,6 +310,8 @@ app.listen(PORT, () => {
 });
 ```
 
+Warning: Remove `{ deployERC4337WithEIP6492: true }` — this option does not exist in the current `@x402/evm` package and will cause a TypeScript compilation error. Use `new ExactEvmScheme(signer)` with the currently installed package versions.
+
 4. Write `.env` and `package.json` (deps: `@x402/core`, `@x402/evm`, `viem`, `express`, `dotenv`)
 5. Run: `npm install && npm run start`
 6. Verify: `curl http://localhost:3000/health` and `curl http://localhost:3000/supported`
@@ -325,6 +333,7 @@ app.listen(PORT, () => {
 | 402 returned but payment not attempted | FACILITATOR_URL is unreachable from client; check network/firewall |
 | "chain not supported" error | Confirm PHAROS_NETWORK env var matches the registered network in both client and server |
 | "insufficient funds" | Wallet has no USDC; get testnet tokens at https://testnet.pharosnetwork.xyz or bridge mainnet USDC via CCTP |
+| Where to get testnet USDC | Visit https://faucet.circle.com and select Pharos network |
 | Transaction not settling | Pharos has sub-second finality; if pending >5s check RPC endpoint at https://atlantic.pharosscan.xyz (testnet) or https://pharosscan.xyz (mainnet) |
 | Module not found @x402/* | Run `npm install` in the correct subdirectory; ensure package.json has the right deps |
 | Wrong USDC decimals | USDC is always 6 decimals: 1 USDC = 1_000_000 raw units |

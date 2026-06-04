@@ -7,3 +7,7 @@ dist/
 pharos-x402-server/
 pharos-x402-client/
 pharos-x402-facilitator/
+examples/server/node_modules/
+examples/client/node_modules/
+examples/facilitator/node_modules/
+examples/*/package-lock.json

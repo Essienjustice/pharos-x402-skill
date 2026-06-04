@@ -49,8 +49,7 @@ const signer = toFacilitatorEvmSigner({
 });
 
 const facilitator = new x402Facilitator();
-facilitator.register(NETWORK_ID, new ExactEvmScheme(signer, { deployERC4337WithEIP6492: true }));
-
+facilitator.register(NETWORK_ID, new ExactEvmScheme(signer));
 const app = express();
 app.use(express.json());
 
